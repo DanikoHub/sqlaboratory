@@ -89,7 +89,7 @@ print(res)
 # [('Alex', 7), ('Kate', 5), ('Peter', 4)]
 ```
 
-### Get select query:
+### Get select query (use -limit):
 **main.py**
 ```python
 from sqlab import SQLab
@@ -99,8 +99,7 @@ SQLab.connect("sqlite:///test.db")
 
 res = SQLab.select_from(
 	_from = Users,
-	_limit = -1)
-print(res)
+	is_query=True)
 # SELECT users.id AS users_id, users.name AS users_name 
 # FROM users
 ```

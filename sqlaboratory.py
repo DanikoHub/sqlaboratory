@@ -21,7 +21,12 @@ class SQLab:
 		Base.metadata.create_all(cls.engine)
 
 	@classmethod
-	def select_from(cls, _from : Base, _select : Base | Any = None, _where : Any = None, _orderby = None, _limit : int = None) -> Any | None:
+	def select_from(cls, 
+				 _from : Base, 
+				 _select : Base | Any = None, 
+				 _where : Any = None, _orderby = None, 
+				 _limit : int = None, 
+				 is_query : bool = False) -> Any | None:
 		try:
 			select = _select if isinstance(_select, list) or _select is None else [_select]
 			with cls.Session as session:
@@ -42,12 +47,13 @@ class SQLab:
 				if len(orderby) > 0:
 					result_query = result_query.order_by(*orderby)
 
-			if _limit == None:
-				return result_query.all()
-			elif _limit == -1:
-				return result_query
+			if _limit is not None:
+				result_query = result_query.limit(_limit)
 			
-			return result_query.limit(_limit).all()
+			if is_query:
+				return result_query
+
+			return result_query.all()
 
 		except Exception as e:
 			print("select - ", e)
@@ -84,7 +90,7 @@ class SQLab:
 	def update(cls, table_name : Base, new_values : Dict[str, Any], _where : Any) -> None:
 		with cls.Session as session:
 			try:
-				objects_to_update = cls.select_from(_from=table_name, _where=_where, _limit=-1)
+				objects_to_update = cls.select_from(_from=table_name, _where=_where, is_query=True)
 				objects_to_update.update(new_values)
 
 			except Exception as e:
@@ -99,7 +105,7 @@ class SQLab:
 	def delete(cls, table_name : Base, _where : Any = None) -> None:
 		with cls.Session as session:
 			try:
-				objects_to_delete = cls.select_from(_from = table_name, _where=_where, _limit=-1)
+				objects_to_delete = cls.select_from(_from = table_name, _where=_where, is_query=True)
 				objects_to_delete.delete()
 
 			except Exception as e:
