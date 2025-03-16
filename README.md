@@ -89,7 +89,7 @@ print(res)
 # [('Alex', 7), ('Kate', 5), ('Peter', 4)]
 ```
 
-### Get select query (use -limit):
+### Get select query:
 **main.py**
 ```python
 from sqlab import SQLab
@@ -104,8 +104,41 @@ res = SQLab.select_from(
 # FROM users
 ```
 
+### Join tables
+**cars.py**
+```python
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+from sqlalchemy import String, BigInteger
+
+from sqlab import SQLab, Base
+
+class Cars(Base):
+	__tablename__ = "cars"
+
+	id: Mapped[int] = mapped_column(primary_key=True)
+	model: Mapped[str] = mapped_column(String)
+	user_id: Mapped[int] = mapped_column(BigInteger)
+
+	def __repr__(self) -> str:
+			return f"\n\nCars(id={self.id} model={self.model} user_id={self.user_id})"
+```
+**main.py**
+```python
+from sqlab import SQLab
+from users import Users, RecordUser
+from cars import Cars, RecordCar
+
+SQLab.connect("sqlite:///test.db")
+
+cars_id = Cars.id.label("cars_id")
+users_id = Users.id.label("users_id")
+res = SQLab.select_from(_from = Cars, _select = [cars_id, users_id, Cars.model, Users.name], is_query=True).join(Users, Cars.user_id == Users.id).all()
+print(res)
+# [(1, 1, 'Kia Rio', 'John'), (2, 1, 'Citroen C5', 'John'), (3, 2, 'BMW M3', 'Simon'), (4, 3, 'Toyota Land Cruiser', 'Anne')]
+```
+
+
 ## What is missing
 
-- **JOINs**
 - **SQL functions**
-- **Table operations**
