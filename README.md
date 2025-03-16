@@ -104,7 +104,7 @@ res = SQLab.select_from(
 # FROM users
 ```
 
-### Join tables
+### Join tables:
 **cars.py**
 ```python
 from sqlalchemy.orm import Mapped
